@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, {useState} from "react";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import GithubIcon from "../../public/github-icon.svg";
@@ -9,7 +9,15 @@ import Image from "next/image";
 
 const EmailSection = () => {
 
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    subject: '',
+    message: '',
+  });
+
   const handleSubmit = async (e) => {
+    // sendTelegramNotification(e.target.name.value, e.target.email.value)
     e.preventDefault();
     const data = {
       name: e.target.name.value,
@@ -31,8 +39,38 @@ const EmailSection = () => {
     const resData = await response.json();
 
     if (response.status === 200) {
+      setFormData({
+        name: '',
+        email: '',
+        subject: '',
+        message: '',
+      });
       toast('Email Send Successfully 🚀')
     }
+  };
+
+
+  const sendTelegramNotification = async (name, email) => {
+    const response = await fetch('/api/telegramMessage', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ name, email }),
+    });
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+
+    const data = await response.json();
+
+  }
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
   };
 
   return (
@@ -85,6 +123,8 @@ const EmailSection = () => {
                 type="text"
                 id="name"
                 required
+                value={formData.name}
+                onChange={handleChange}
                 className="bg-[#18191E] border border-[#33353F] placeholder-[#9CA2A9] text-gray-100 text-sm rounded-lg block w-full p-2.5"
                 placeholder="Prasanna David"
               />
@@ -101,6 +141,8 @@ const EmailSection = () => {
                 type="email"
                 id="email"
                 required
+                value={formData.email}
+                onChange={handleChange}
                 className="bg-[#18191E] border border-[#33353F] placeholder-[#9CA2A9] text-gray-100 text-sm rounded-lg block w-full p-2.5"
                 placeholder="rdavidprasanna@google.com"
               />
@@ -117,6 +159,8 @@ const EmailSection = () => {
                 type="text"
                 id="subject"
                 required
+                value={formData.subject}
+                onChange={handleChange}
                 className="bg-[#18191E] border border-[#33353F] placeholder-[#9CA2A9] text-gray-100 text-sm rounded-lg block w-full p-2.5"
                 placeholder="Just saying hi"
               />
@@ -131,6 +175,8 @@ const EmailSection = () => {
               <textarea
                 name="message"
                 id="message"
+                value={formData.message}
+                onChange={handleChange}
                 className="bg-[#18191E] border border-[#33353F] placeholder-[#9CA2A9] text-gray-100 text-sm rounded-lg block w-full p-2.5"
                 placeholder="Let's talk about..."
               />

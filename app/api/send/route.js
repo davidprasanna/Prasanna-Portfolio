@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import nodemailer from 'nodemailer';
+import axios from 'axios';
 
 const adminEmail = process.env.ADMIN_EMAIL;
 const transporter = nodemailer.createTransport({
@@ -130,7 +131,17 @@ export async function POST(req, res) {
       transporter.sendMail(adminMailOptions)
     ]);
 
-    return NextResponse.json({ message: 'Emails sent successfully' });
+    const botToken = process.env.TELEGRAM_BOT_TOKEN;
+    const chatId = process.env.TELEGRAM_CHAT_ID;
+    const alertMessage = `Hi David,\nAn employer contacted you through your portfolio website.\nEmployer Info:\nName: ${name}\nEmail: ${email}`;
+    const response = await axios.post(
+        `https://api.telegram.org/bot${botToken}/sendMessage`,
+        {
+            chat_id: chatId,
+            text: alertMessage,
+        }
+    );
+    return NextResponse.json({ message: 'Email sent successfully' });
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error: 'Error sending emails' });
