@@ -25,3 +25,8 @@ body {
     )
     rgb(var(--background-start-rgb));
 }
+
+.Toastify .Toastify__toast-theme--dark {
+  background-color: white !important;
+  color: #A966F7 !important;
+}
