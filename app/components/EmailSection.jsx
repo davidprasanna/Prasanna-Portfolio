@@ -1,5 +1,5 @@
 "use client";
-import React, {useState} from "react";
+import React, { useState } from "react";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import GithubIcon from "../../public/github-icon.svg";
@@ -93,7 +93,7 @@ const EmailSection = () => {
           open. Feel free to connect.
         </p>
         <div className="socials flex flex-row gap-2">
-          <Link href="github.com">
+          <Link target="_blank" href="https://github.com/davidprasanna/Prasanna-Portfolio">
             <Image src={GithubIcon} alt="Github Icon" />
           </Link>
           <Link href="https://www.linkedin.com/in/prasanna-david" target="_blank"
