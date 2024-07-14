@@ -17,7 +17,6 @@ const EmailSection = () => {
   });
 
   const handleSubmit = async (e) => {
-    // sendTelegramNotification(e.target.name.value, e.target.email.value)
     e.preventDefault();
     const data = {
       name: e.target.name.value,
@@ -25,45 +24,51 @@ const EmailSection = () => {
       subject: e.target.subject.value,
       message: e.target.message.value,
     };
-    const JSONdata = JSON.stringify(data);
-    const endpoint = "/api/send";
+    try {
+      const JSONdata = JSON.stringify(data);
+      const endpoint = "/api/send";
+      const options = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSONdata,
+      };
+  
+      const response = await fetch(endpoint, options);
+      const resData = await response.json();
+  
+      if (response.status === 200) {
+        setFormData({
+          name: '',
+          email: '',
+          subject: '',
+          message: '',
+        });
+        toast('Email Send Successfully 🚀')
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      toast('Error sending message');
+    }
+
+    //Send Telegram notification
+    await sendTelegramNotification(data.name, data.email)
+  };
+
+
+  const sendTelegramNotification = async (name, email) => {
+    const endpoint = "/api/sendTelegramNotification";
     const options = {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSONdata,
+      body: JSON.stringify({ name, email }),
     };
-
     const response = await fetch(endpoint, options);
     const resData = await response.json();
-
-    if (response.status === 200) {
-      setFormData({
-        name: '',
-        email: '',
-        subject: '',
-        message: '',
-      });
-      toast('Email Send Successfully 🚀')
-    }
-  };
-
-
-  const sendTelegramNotification = async (name, email) => {
-    const response = await fetch('/api/telegramMessage', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ name, email }),
-    });
-    if (!response.ok) {
-      throw new Error('Network response was not ok');
-    }
-
-    const data = await response.json();
-
+    console.log('resData:',resData);
   }
 
   const handleChange = (e) => {
