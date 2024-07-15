@@ -130,7 +130,7 @@ export async function POST(req, res) {
       transporter.sendMail(adminMailOptions)
     ]);
 
-    return NextResponse.json({ message: 'Emails sent successfully' });
+    return NextResponse.json({ message: 'Email sent successfully' });
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error: 'Error sending emails' });

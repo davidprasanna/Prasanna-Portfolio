@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import GithubIcon from "../../public/github-icon.svg";
@@ -9,6 +9,13 @@ import Image from "next/image";
 
 const EmailSection = () => {
 
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    subject: '',
+    message: '',
+  });
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const data = {
@@ -17,22 +24,58 @@ const EmailSection = () => {
       subject: e.target.subject.value,
       message: e.target.message.value,
     };
-    const JSONdata = JSON.stringify(data);
-    const endpoint = "/api/send";
+    try {
+      const JSONdata = JSON.stringify(data);
+      const endpoint = "/api/send";
+      const options = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSONdata,
+      };
+  
+      const response = await fetch(endpoint, options);
+      const resData = await response.json();
+  
+      if (response.status === 200) {
+        setFormData({
+          name: '',
+          email: '',
+          subject: '',
+          message: '',
+        });
+        toast('Email Send Successfully 🚀')
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      toast('Error sending message');
+    }
+
+    //Send Telegram notification
+    await sendTelegramNotification(data.name, data.email)
+  };
+
+
+  const sendTelegramNotification = async (name, email) => {
+    const endpoint = "/api/sendTelegramNotification";
     const options = {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSONdata,
+      body: JSON.stringify({ name, email }),
     };
-
     const response = await fetch(endpoint, options);
     const resData = await response.json();
+    console.log('resData:',resData);
+  }
 
-    if (response.status === 200) {
-      toast('Email Send Successfully 🚀')
-    }
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
   };
 
   return (
@@ -50,7 +93,7 @@ const EmailSection = () => {
           open. Feel free to connect.
         </p>
         <div className="socials flex flex-row gap-2">
-          <Link href="github.com">
+          <Link target="_blank" href="https://github.com/davidprasanna/Prasanna-Portfolio">
             <Image src={GithubIcon} alt="Github Icon" />
           </Link>
           <Link href="https://www.linkedin.com/in/prasanna-david" target="_blank"
@@ -85,6 +128,8 @@ const EmailSection = () => {
                 type="text"
                 id="name"
                 required
+                value={formData.name}
+                onChange={handleChange}
                 className="bg-[#18191E] border border-[#33353F] placeholder-[#9CA2A9] text-gray-100 text-sm rounded-lg block w-full p-2.5"
                 placeholder="Prasanna David"
               />
@@ -101,6 +146,8 @@ const EmailSection = () => {
                 type="email"
                 id="email"
                 required
+                value={formData.email}
+                onChange={handleChange}
                 className="bg-[#18191E] border border-[#33353F] placeholder-[#9CA2A9] text-gray-100 text-sm rounded-lg block w-full p-2.5"
                 placeholder="rdavidprasanna@google.com"
               />
@@ -117,6 +164,8 @@ const EmailSection = () => {
                 type="text"
                 id="subject"
                 required
+                value={formData.subject}
+                onChange={handleChange}
                 className="bg-[#18191E] border border-[#33353F] placeholder-[#9CA2A9] text-gray-100 text-sm rounded-lg block w-full p-2.5"
                 placeholder="Just saying hi"
               />
@@ -131,6 +180,8 @@ const EmailSection = () => {
               <textarea
                 name="message"
                 id="message"
+                value={formData.message}
+                onChange={handleChange}
                 className="bg-[#18191E] border border-[#33353F] placeholder-[#9CA2A9] text-gray-100 text-sm rounded-lg block w-full p-2.5"
                 placeholder="Let's talk about..."
               />
